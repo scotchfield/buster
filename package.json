@@ -1,0 +1,11 @@
+{
+  "name": "buster",
+  "version": "1.0.0",
+  "description": "Buster, a buddy for posting new stuff to Twitter",
+  "dependencies": {
+    "express": "^4.12.0",
+    "mongoose": "~3.8.23",
+    "qunitjs": "^1.17.1",
+    "request": "^2.53.0"
+  }
+}
