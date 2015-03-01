@@ -1,5 +1,5 @@
 var BusterBox = React.createClass({
-  loadFromServer: function() {
+  loadFromServer: function () {
     $.ajax({
       url: this.props.url,
       dataType:'json',
@@ -12,13 +12,13 @@ var BusterBox = React.createClass({
       }.bind(this)
     });
   },
-  getInitialState: function() {
+  getInitialState: function () {
     return {data: []};
   },
-  componentDidMount: function() {
+  componentDidMount: function () {
     this.loadFromServer();
   },
-  render: function() {
+  render: function () {
     return (
       <div className="busterBox">
         <BusterList data={this.state.data} />
@@ -28,7 +28,7 @@ var BusterBox = React.createClass({
 });
 
 var BusterList = React.createClass({
-  render: function() {
+  render: function () {
     var busterNodes = this.props.data.map(function (node) {
       return (
         <BusterNode name={node.name} url={node.url} />
@@ -42,11 +42,21 @@ var BusterList = React.createClass({
   }
 });
 
+var BusterTweet = React.createClass({
+  render: function () {
+    return (
+      <div class="row text-center">
+      <a href="https://twitter.com/share" class="twitter-share-button" data-url={this.props.data.url} data-text={this.props.data.name} data-size="large" data-count="none">Tweet</a>
+      </div>
+    );
+  }
+});
+
 var BusterNode = React.createClass({
-  render: function() {
+  render: function () {
     return (
       <div className="busterNode">
-      <span>{this.props.name} <a href={this.props.url}>{this.props.url}</a></span>
+      <span><BusterTweet data={this.props} /> {this.props.name} <a href={this.props.url}>{this.props.url}</a></span>
       </div>
     );
   }
