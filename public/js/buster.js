@@ -21,7 +21,6 @@ var BusterBox = React.createClass({
   render: function() {
     return (
       <div className="busterBox">
-        <h1>Available Tweets</h1>
         <BusterList data={this.state.data} />
       </div>
     );
@@ -47,7 +46,7 @@ var BusterNode = React.createClass({
   render: function() {
     return (
       <div className="busterNode">
-        <span>{this.props.name} {this.props.url}</span>
+      <span>{this.props.name} <a href={this.props.url}>{this.props.url}</a></span>
       </div>
     );
   }
