@@ -36,3 +36,13 @@ div.tweetImg {
 div.busterTweet {
   padding-left: 40px;
 }
+
+div.add-more {
+  background-color: #ffffff;
+  border-radius: 16px;
+  font-size: 125%;
+  margin: auto;
+  padding: 16px;
+  text-align: center;
+  width: 240px;
+}

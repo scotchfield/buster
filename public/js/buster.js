@@ -12,6 +12,11 @@ var BusterBox = React.createClass({
       }.bind(this)
     });
   },
+  appendData: function (data) {
+    data.forEach(function (current) {
+      this.state.data.push(current);
+    });
+  },
   getInitialState: function () {
     return {data: []};
   },
@@ -68,7 +73,20 @@ var BusterNode = React.createClass({
 });
 
 
-React.render(
+var busterComponent = React.render(
   <BusterBox url="/link" />,
   document.getElementById('content')
 );
+
+
+$(document).ready(function () {
+  $('div.add-more').on('click', function () {
+    $.getJSON('/link', function (data) {
+      var state = busterComponent.state;
+      data.forEach(function (current) {
+        state.data.push(current);
+      });
+      busterComponent.setState(state);
+    });
+  });
+});
