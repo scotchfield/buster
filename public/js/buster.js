@@ -44,10 +44,10 @@ var BusterList = React.createClass({
 
 var BusterTweet = React.createClass({
   render: function () {
+    var url = "https://twitter.com/intent/tweet?text=" + this.props.data.name +
+              "&url=" + this.props.data.url;
     return (
-      <div class="row text-center">
-      <a href="https://twitter.com/share" class="twitter-share-button" data-url={this.props.data.url} data-text={this.props.data.name} data-size="large" data-count="none">Tweet</a>
-      </div>
+      <a href={url}>tweet</a>
     );
   }
 });
