@@ -28,3 +28,11 @@ div.busterNode {
   margin: 16px;
   padding: 16px;
 }
+
+div.tweetImg {
+  float: left;
+}
+
+div.busterTweet {
+  padding-left: 40px;
+}

@@ -47,7 +47,9 @@ var BusterTweet = React.createClass({
     var url = "https://twitter.com/intent/tweet?text=" + this.props.data.name +
               "&url=" + this.props.data.url;
     return (
-      <a href={url}>tweet</a>
+      <div className="tweetImg">
+        <a href={url}><img src="img/tweet.png" width="24" height="24" /></a>
+      </div>
     );
   }
 });
@@ -56,7 +58,10 @@ var BusterNode = React.createClass({
   render: function () {
     return (
       <div className="busterNode">
-      <span><BusterTweet data={this.props} /> {this.props.name} <a href={this.props.url}>{this.props.url}</a></span>
+        <BusterTweet data={this.props} />
+        <div className="busterTweet">
+          {this.props.name} <a href={this.props.url}>{this.props.url}</a>
+        </div>
       </div>
     );
   }
@@ -64,6 +69,6 @@ var BusterNode = React.createClass({
 
 
 React.render(
-  <BusterBox url="/links" />,
+  <BusterBox url="/link" />,
   document.getElementById('content')
 );

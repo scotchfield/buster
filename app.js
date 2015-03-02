@@ -53,12 +53,15 @@ doJsonRequest = function (url, headers, dataFunction) {
   });
 };
 
-//doJsonRequest(url, headers, getDataReddit);
 
-
-/*app.get('/', function (req, res) {
-  res.send('hello world');
-});*/
+app.get('/link', function(req, res) {
+  LinkModel.count({}, function (err, n) {
+    var r = Math.floor(Math.random() * n);
+    var query = LinkModel.find({}).limit(1).skip(r).exec(function (err, doc) {
+      res.send(doc);
+    });
+  });
+});
 
 app.get('/links', function(req, res) {
   LinkModel.find({}, function (err, docs) {
