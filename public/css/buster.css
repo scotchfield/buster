@@ -1,7 +1,30 @@
+body {
+  background-color: #2da8d2;
+  background-image: url("../img/wave.png");
+  background-repeat: repeat-x;
+  font-family: 'Calisto MT', 'Bookman Old Style', Bookman, 'Goudy Old Style', Garamond, 'Hoefler Text', 'Bitstream Charter', Georgia, serif;
+}
+
+div.container {
+  margin: auto;
+  width: 800px;
+}
+
+.header {
+  text-align: center;
+}
+
+.invis {
+  display: none;
+}
+
 div.busterBox {
-  padding-top: 32px;
+  padding-top: 64px;
 }
 
 div.busterNode {
+  background-color: #ffffff;
+  border-radius: 16px;
   margin: 16px;
+  padding: 16px;
 }
