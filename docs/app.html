@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>app.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>app.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <p>Buster: Your Twitter Buddy</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>When you need some new and interesting content for your feed, Buster
+is there.</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>View new tweet-sized pieces of content in the browser window. Use react.js
+to pull new data, or hide old ones. On the server-side, node.js polls
+data sources and stores the results in MongoDB. Clicking on a Buster node
+redirects you to a Twitter intent page, so Buster never needs to know
+your login information. Buster just wants you to post cool stuff.</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Buster is inspired by Buffer, a totally awesome and cool thing.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-pi">
+'use strict'</span>;
+
+<span class="hljs-keyword">var</span> express = <span class="hljs-built_in">require</span>(<span class="hljs-string">'express'</span>),
+    request = <span class="hljs-built_in">require</span>(<span class="hljs-string">'request'</span>),
+    path = <span class="hljs-built_in">require</span>(<span class="hljs-string">'path'</span>),
+    bodyParser = <span class="hljs-built_in">require</span>(<span class="hljs-string">'body-parser'</span>),
+    mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mongoose'</span>),
+    xml2js = <span class="hljs-built_in">require</span>(<span class="hljs-string">'xml2js'</span>),
+
+    headers = {<span class="hljs-string">'User-Agent'</span>: <span class="hljs-string">'Buster/1.0.0 (by /u/scotchfield)'</span>},
+
+    app = express(), port = <span class="hljs-number">8000</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>Regardless of the data source, we abstract every piece of information
+into a name and a url. The date indicates when we retrieved this data,
+and if it’s been around too long, we won’t serve it to the client.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>Link = <span class="hljs-keyword">new</span> mongoose.Schema({
+    name: <span class="hljs-built_in">String</span>,
+    url: <span class="hljs-built_in">String</span>,
+    date: { type: <span class="hljs-built_in">Date</span>, <span class="hljs-keyword">default</span>: <span class="hljs-built_in">Date</span>.now }
+}),
+LinkModel = mongoose.model(<span class="hljs-string">'Link'</span>, Link),</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Accept a name and a url, and store them in the database. If the link
+already exists, don’t write anything.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>addLink = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(name, url)</span> </span>{
+    LinkModel.find({name: name, url: url}, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(err, docs)</span> </span>{
+        <span class="hljs-keyword">if</span> (docs.length === <span class="hljs-number">0</span>) {
+            <span class="hljs-keyword">var</span> link = <span class="hljs-keyword">new</span> LinkModel({name: name, url: url});
+            link.save(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(err)</span> </span>{});
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'Added: '</span> + name);
+        }
+    });
+},</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Async request to a JSON data source. If we get valid data in return,
+use the supplied callback.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>doJsonRequest = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(url, headers, fun)</span> </span>{
+    request({url: url, headers: headers, json: <span class="hljs-literal">true</span>},
+            <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(error, response, body)</span> </span>{
+        <span class="hljs-keyword">if</span> (! error &amp;&amp; response.statusCode === <span class="hljs-number">200</span>) {
+            fun(body);
+        }
+    });
+},</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Async request to an XML data source. If we get valid data in return,
+use the supplied callback.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>doXmlRequest = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(url, headers, fun)</span> </span>{
+    request({url: url, headers: headers}, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(error, response, body)</span> </span>{
+        xml2js.parseString(body, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(err, result)</span> </span>{
+            fun(result);
+        });
+    });
+},</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>A sample JSON data source. For each of the results, identify the name
+and the URL that we want to include in a tweet, and add the link to the
+database.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>getDataReddit = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(body)</span> </span>{
+    <span class="hljs-keyword">var</span> url = <span class="hljs-string">'http://api.reddit.com/hot.json'</span>;
+    doJsonRequest(url, headers, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(body)</span> </span>{
+        body.data.children.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(result)</span> </span>{
+            addLink(result.data.title, result.data.url);
+        });
+    });
+},</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>A sample XML data source. Buster uses xml2js to convert the XML to JSON,
+so this looks very similar to the JSON function above.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>getDataLifehacker = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(body)</span> </span>{
+    <span class="hljs-keyword">var</span> url = <span class="hljs-string">'http://feeds.gawker.com/lifehacker/full'</span>;
+    doXmlRequest(url, headers, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(body)</span> </span>{
+        <span class="hljs-keyword">var</span> data = body.rss.channel[<span class="hljs-number">0</span>].item;
+        data.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(result)</span> </span>{
+            addLink(result.title[<span class="hljs-number">0</span>], result.link[<span class="hljs-number">0</span>]);
+        });
+    });
+},</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>Save a list of callbacks that we will periodically poll for new content.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>sources = [
+    getDataReddit,
+    getDataLifehacker,
+],
+
+updateDb = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    sources.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(current)</span> </span>{
+        current();
+    });
+};
+
+
+mongoose.connect(<span class="hljs-string">'mongodb://localhost/buster'</span>);
+
+app.use(<span class="hljs-string">'/'</span>, express.static(path.join(__dirname, <span class="hljs-string">'public'</span>)));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: <span class="hljs-literal">true</span>}));</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>The client will poll /link when the user hits “One more?” Buster returns
+a single element from the database collection pulled at random. Note that
+we don’t delete anything, and we don’t store which data has already been
+sent, so the user may see duplicates.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>app.get(<span class="hljs-string">'/link'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res)</span> </span>{
+    <span class="hljs-keyword">var</span> query_time = {
+        <span class="hljs-string">'date'</span>: {
+            <span class="hljs-string">'$gte'</span>: <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>(<span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>() - <span class="hljs-number">1000</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span> * <span class="hljs-number">24</span>)
+        }
+    };
+    LinkModel.count(query_time, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(err, n)</span> </span>{
+        <span class="hljs-keyword">var</span> r = <span class="hljs-built_in">Math</span>.floor(<span class="hljs-built_in">Math</span>.random() * n);
+        <span class="hljs-keyword">var</span> query = LinkModel.find(query_time)
+            .limit(<span class="hljs-number">1</span>)
+            .skip(r)
+            .exec(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(err, doc)</span> </span>{
+                res.send(doc);
+            });
+    });
+});
+
+app.listen(port, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'Express server listening on port %d in %s mode'</span>,
+                port, app.settings.env );
+});</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>Update database every 10 minutes.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>updateDb();
+setInterval(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    updateDb();
+}, <span class="hljs-number">1000</span> * <span class="hljs-number">60</span> * <span class="hljs-number">10</span>);</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

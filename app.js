@@ -1,3 +1,16 @@
+// Buster: Your Twitter Buddy
+
+// When you need some new and interesting content for your feed, Buster
+// is there.
+
+// View new tweet-sized pieces of content in the browser window. Use react.js
+// to pull new data, or hide old ones. On the server-side, node.js polls
+// data sources and stores the results in MongoDB. Clicking on a Buster node
+// redirects you to a Twitter intent page, so Buster never needs to know
+// your login information. Buster just wants you to post cool stuff.
+
+// Buster is inspired by Buffer, a totally awesome and cool thing.
+
 'use strict';
 
 var express = require('express'),
@@ -11,6 +24,9 @@ var express = require('express'),
 
     app = express(), port = 8000,
 
+// Regardless of the data source, we abstract every piece of information
+// into a name and a url. The date indicates when we retrieved this data,
+// and if it's been around too long, we won't serve it to the client.
 Link = new mongoose.Schema({
     name: String,
     url: String,
@@ -18,6 +34,8 @@ Link = new mongoose.Schema({
 }),
 LinkModel = mongoose.model('Link', Link),
 
+// Accept a name and a url, and store them in the database. If the link
+// already exists, don't write anything.
 addLink = function (name, url) {
     LinkModel.find({name: name, url: url}, function (err, docs) {
         if (docs.length === 0) {
@@ -28,6 +46,8 @@ addLink = function (name, url) {
     });
 },
 
+// Async request to a JSON data source. If we get valid data in return,
+// use the supplied callback.
 doJsonRequest = function (url, headers, fun) {
     request({url: url, headers: headers, json: true},
             function (error, response, body) {
@@ -37,6 +57,8 @@ doJsonRequest = function (url, headers, fun) {
     });
 },
 
+// Async request to an XML data source. If we get valid data in return,
+// use the supplied callback.
 doXmlRequest = function (url, headers, fun) {
     request({url: url, headers: headers}, function (error, response, body) {
         xml2js.parseString(body, function (err, result) {
@@ -45,6 +67,9 @@ doXmlRequest = function (url, headers, fun) {
     });
 },
 
+// A sample JSON data source. For each of the results, identify the name
+// and the URL that we want to include in a tweet, and add the link to the
+// database.
 getDataReddit = function (body) {
     var url = 'http://api.reddit.com/hot.json';
     doJsonRequest(url, headers, function (body) {
@@ -54,6 +79,8 @@ getDataReddit = function (body) {
     });
 },
 
+// A sample XML data source. Buster uses xml2js to convert the XML to JSON,
+// so this looks very similar to the JSON function above.
 getDataLifehacker = function (body) {
     var url = 'http://feeds.gawker.com/lifehacker/full';
     doXmlRequest(url, headers, function (body) {
@@ -64,6 +91,7 @@ getDataLifehacker = function (body) {
     });
 },
 
+// Save a list of callbacks that we will periodically poll for new content.
 sources = [
     getDataReddit,
     getDataLifehacker,
@@ -82,7 +110,10 @@ app.use('/', express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-
+// The client will poll /link when the user hits "One more?" Buster returns
+// a single element from the database collection pulled at random. Note that
+// we don't delete anything, and we don't store which data has already been
+// sent, so the user may see duplicates.
 app.get('/link', function(req, res) {
     var query_time = {
         'date': {
@@ -97,12 +128,6 @@ app.get('/link', function(req, res) {
             .exec(function (err, doc) {
                 res.send(doc);
             });
-    });
-});
-
-app.get('/links', function(req, res) {
-    LinkModel.find({}, function (err, docs) {
-        res.send(docs);
     });
 });
 
