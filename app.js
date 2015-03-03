@@ -51,6 +51,10 @@ doJsonRequest = function (url, headers, dataFunction) {
       });
     }
   });
+},
+
+updateDb = function () {
+  doJsonRequest(url, headers, getDataReddit);
 };
 
 
@@ -70,10 +74,17 @@ app.get('/links', function(req, res) {
 });
 
 app.get('/update', function(req, res) {
-  doJsonRequest(url, headers, getDataReddit);
-});  
+  //doJsonRequest(url, headers, getDataReddit);
+  updateDb();
+});
 
 app.listen(port, function() {
   console.log('Express server listening on port %d in %s mode',
               port, app.settings.env );
 });
+
+// Update database on start, and every 10 minutes afterwards.
+updateDb();
+setInterval(function () {
+  updateDb();
+}, 1000 * 60 * 10);
