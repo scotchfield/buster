@@ -27,7 +27,7 @@ LinkModel = mongoose.model('Link', Link),
 getDataReddit = function (body) {
   var data = [];
   body.data.children.forEach(function (result) {
-    console.log(result);
+    //console.log(result);
     data.push({name: result.data.title, url: result.data.url});
   });
   return data;
@@ -59,9 +59,17 @@ updateDb = function () {
 
 
 app.get('/link', function(req, res) {
-  LinkModel.count({}, function (err, n) {
+  var query_time = {
+    'date': {
+      '$gte': new Date(new Date() - 1000 * 60 * 60 * 24)
+    }
+  };
+  LinkModel.count(query_time, function (err, n) {
     var r = Math.floor(Math.random() * n);
-    var query = LinkModel.find({}).limit(1).skip(r).exec(function (err, doc) {
+    var query = LinkModel.find(query_time)
+        .limit(1)
+        .skip(r)
+        .exec(function (err, doc) {
       res.send(doc);
     });
   });
