@@ -6,56 +6,61 @@ var express = require('express'),
     bodyParser = require('body-parser'),
     mongoose = require('mongoose'),
 
-    url = 'http://api.reddit.com/hot.json',
     headers = {'User-Agent': 'Buster/1.0.0 (by /u/scotchfield)'},
 
-    app = express(), port = 8000;
+    app = express(), port = 8000,
 
-app.use('/', express.static(path.join(__dirname, 'public')));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
-
-mongoose.connect('mongodb://localhost/buster');
-
-var Link = new mongoose.Schema({
+Link = new mongoose.Schema({
   name: String,
   url: String,
   date: { type: Date, default: Date.now }
 }),
 LinkModel = mongoose.model('Link', Link),
 
-getDataReddit = function (body) {
-  var data = [];
-  body.data.children.forEach(function (result) {
-    //console.log(result);
-    data.push({name: result.data.title, url: result.data.url});
+addLink = function (name, url) {
+  LinkModel.find({name: name, url: url}, function (err, docs) {
+    if (docs.length === 0) {
+      var link = new LinkModel({name: name, url: url});
+      link.save(function (err) {});
+      console.log('Added: ' + name);
+    }
   });
-  return data;
 },
 
 doJsonRequest = function (url, headers, dataFunction) {
   request({url: url, headers: headers, json: true},
           function (error, response, body) {
     if (! error && response.statusCode === 200) {
-      dataFunction(body).forEach(function (data) {
-        LinkModel.find({name: data.name, url: data.url},
-                       function (err, docs) {
-          if (docs.length === 0) {
-            var link = new LinkModel({name: data.name, url: data.url});
-            link.save(function (err) {});
-            console.log('* Added: ' + data.name);
-          } else {
-            console.log('Existing: ' + data.name);
-          }
-        });
-      });
+      dataFunction(body);
     }
   });
 },
 
+getDataReddit = function (body) {
+  var url = 'http://api.reddit.com/hot.json';
+  doJsonRequest(url, headers, function (body) {
+    body.data.children.forEach(function (result) {
+      addLink(result.data.title, result.data.url);
+    });
+  });
+},
+
+sources = [
+    getDataReddit,
+],
+
 updateDb = function () {
-  doJsonRequest(url, headers, getDataReddit);
+  sources.forEach(function (current) {
+    current();
+  });
 };
+
+
+mongoose.connect('mongodb://localhost/buster');
+
+app.use('/', express.static(path.join(__dirname, 'public')));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 
 
 app.get('/link', function(req, res) {
@@ -87,6 +92,7 @@ app.listen(port, function() {
 });
 
 // Update database every 10 minutes.
+updateDb();
 setInterval(function () {
   updateDb();
 }, 1000 * 60 * 10);

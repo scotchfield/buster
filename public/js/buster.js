@@ -71,8 +71,8 @@ var BusterNode = React.createClass({
     this.unmount();
   },
   render: function () {
-    var url = this.props.url.length <= 60 ? this.props.url :
-              this.props.url.slice(0, 30) + '...' + this.props.url.slice(-30);
+    var url = this.props.url || '';
+    url = url.length <= 60 ? url : url.slice(0, 30) + '...' + url.slice(-30);
 
     return (
       <div className="busterNode">
