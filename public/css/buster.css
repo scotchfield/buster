@@ -34,7 +34,7 @@ div.tweetImg {
 }
 
 div.busterTweet {
-  padding-left: 40px;
+  padding-left: 80px;
 }
 
 div.add-more {
@@ -45,4 +45,11 @@ div.add-more {
   padding: 16px;
   text-align: center;
   width: 240px;
+}
+
+div.deleteNode {
+  float: left;
+  color: #92374d;
+  font-size: 150%;
+  padding-left: 16px;
 }

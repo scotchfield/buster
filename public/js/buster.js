@@ -62,14 +62,22 @@ var BusterTweet = React.createClass({
 });
 
 var BusterNode = React.createClass({
+  unmount: function () {
+    var node = this.getDOMNode();
+    React.unmountComponentAtNode(node);
+    $(node).remove();
+  },
+  handleClick: function (e) {
+    this.unmount();
+  },
   render: function () {
-    var url = this.props.url;
-    if (url.length > 60) {
-        url = url.slice(0, 30) + '...' + url.slice(-30);
-    }
+    var url = this.props.url.length <= 60 ? this.props.url :
+              this.props.url.slice(0, 30) + '...' + this.props.url.slice(-30);
+
     return (
       <div className="busterNode">
         <BusterTweet data={this.props} />
+        <div className="deleteNode" onClick={this.handleClick}>✖</div>
         <div className="busterTweet">
           {this.props.name} <a href={this.props.url} target="_blank">{url}</a>
         </div>

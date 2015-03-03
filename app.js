@@ -81,11 +81,6 @@ app.get('/links', function(req, res) {
   });
 });
 
-app.get('/update', function(req, res) {
-  //doJsonRequest(url, headers, getDataReddit);
-  updateDb();
-});
-
 app.listen(port, function() {
   console.log('Express server listening on port %d in %s mode',
               port, app.settings.env );
