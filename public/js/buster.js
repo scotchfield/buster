@@ -53,7 +53,9 @@ var BusterTweet = React.createClass({
               "&url=" + this.props.data.url;
     return (
       <div className="tweetImg">
-        <a href={url}><img src="img/tweet.png" width="24" height="24" /></a>
+        <a href={url} target="_blank">
+          <img src="img/tweet.png" width="24" height="24" />
+        </a>
       </div>
     );
   }
@@ -61,11 +63,15 @@ var BusterTweet = React.createClass({
 
 var BusterNode = React.createClass({
   render: function () {
+    var url = this.props.url;
+    if (url.length > 60) {
+        url = url.slice(0, 30) + '...' + url.slice(-30);
+    }
     return (
       <div className="busterNode">
         <BusterTweet data={this.props} />
         <div className="busterTweet">
-          {this.props.name} <a href={this.props.url}>{this.props.url}</a>
+          {this.props.name} <a href={this.props.url} target="_blank">{url}</a>
         </div>
       </div>
     );

@@ -91,8 +91,7 @@ app.listen(port, function() {
               port, app.settings.env );
 });
 
-// Update database on start, and every 10 minutes afterwards.
-updateDb();
+// Update database every 10 minutes.
 setInterval(function () {
   updateDb();
 }, 1000 * 60 * 10);
